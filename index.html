@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>QR Code Generator</title>
+    <script src="https://cdn.rawgit.com/davidshimjs/qrcodejs/gh-pages/qrcode.min.js"></script>
+</head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 20px;
+        text-align: center;
+    }
+    #urlInput {
+        width: 80%;
+        padding: 10px;
+        margin: 10px 0;
+    }
+    button {
+        padding: 10px 20px;
+        background: #007BFF;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+    }
+    button:hover {
+        background: #0056b3;
+    }
+</style>
+<body>
+    <div id="qrcode"></div>
+    <input type="text" id="urlInput" placeholder="Enter URL">
+    <button onclick="generateQR()">Generate QR Code</button>
+<button onclick="downloadQR()">Download QR Code</button>
+
+    <script>
+        function generateQR() {
+            const url = document.getElementById('urlInput').value;
+            if (!url) return;
+            
+            // Clear previous QR code
+            document.getElementById('qrcode').innerHTML = '';
+            
+            // Generate new QR code
+            new QRCode(document.getElementById('qrcode'), {
+                text: url,
+                width: 200,
+                height: 200,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H
+            });
+        }
+        function downloadQR() {
+        const qrCodeImg = document.querySelector("#qrcode img");
+        if (!qrCodeImg) return alert("Generate a QR code first!");
+
+        const link = document.createElement("a");
+        link.href = qrCodeImg.src;
+        link.download = "qrcode.png";
+        link.click();
+    }
+    </script>
+</body>
+</html>

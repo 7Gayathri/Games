@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Rock Paper Scissors</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 100%;
+        }
+        .choices {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .choice-btn {
+            background: none;
+            border: 3px solid #4CAF50;
+            border-radius: 50%;
+            width: 80px;
+            height: 80px;
+            font-size: 40px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .choice-btn:hover {
+            background: #4CAF50;
+            color: white;
+            transform: scale(1.1);
+        }
+        .result {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px 0;
+            min-height: 36px;
+        }
+        .scores {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+        }
+        .score-box {
+            background: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .history {
+            margin-top: 20px;
+            text-align: left;
+            max-height: 150px;
+            overflow-y: auto;
+            border-top: 1px solid #ddd;
+            padding-top: 10px;
+        }
+        .history-item {
+            padding: 5px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .reset-btn {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+        }
+        .reset-btn:hover {
+            background: #d32f2f;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>Rock Paper Scissors</h1>
+        
+        <div class="choices">
+            <button class="choice-btn" data-choice="rock">✊</button>
+            <button class="choice-btn" data-choice="paper">✋</button>
+            <button class="choice-btn" data-choice="scissors">✌️</button>
+        </div>
+        
+        <div class="result" id="result">Choose your move!</div>
+        
+        <div class="scores">
+            <div class="score-box">You: <span id="player-score">0</span></div>
+            <div class="score-box">Computer: <span id="computer-score">0</span></div>
+        </div>
+        
+        <button class="reset-btn" id="reset-btn">Reset Game</button>
+        
+        <div class="history">
+            <h3>Game History:</h3>
+            <div id="history-list"></div>
+        </div>
+    </div>
+
+    <script>
+        // Game elements
+        const resultDisplay = document.getElementById('result');
+        const playerScoreDisplay = document.getElementById('player-score');
+        const computerScoreDisplay = document.getElementById('computer-score');
+        const historyList = document.getElementById('history-list');
+        const resetBtn = document.getElementById('reset-btn');
+        const choiceButtons = document.querySelectorAll('.choice-btn');
+        
+        // Game state
+        let playerScore = 0;
+        let computerScore = 0;
+        let gameHistory = [];
+        
+        // Computer's random choice
+        function getComputerChoice() {
+            const choices = ['rock', 'paper', 'scissors'];
+            const randomIndex = Math.floor(Math.random() * 3);
+            return choices[randomIndex];
+        }
+        
+        // Determine the winner
+        function determineWinner(playerChoice, computerChoice) {
+            if (playerChoice === computerChoice) {
+                return 'draw';
+            }
+            
+            if (
+                (playerChoice === 'rock' && computerChoice === 'scissors') ||
+                (playerChoice === 'paper' && computerChoice === 'rock') ||
+                (playerChoice === 'scissors' && computerChoice === 'paper')
+            ) {
+                return 'player';
+            }
+            
+            return 'computer';
+        }
+        
+        // Update the game display
+        function updateGame(result, playerChoice, computerChoice) {
+            // Update result display
+            const choicesDisplay = {
+                rock: '✊ Rock',
+                paper: '✋ Paper',
+                scissors: '✌️ Scissors'
+            };
+            
+            let resultText = '';
+            switch(result) {
+                case 'player':
+                    resultText = `You win! ${choicesDisplay[playerChoice]} beats ${choicesDisplay[computerChoice]}`;
+                    playerScore++;
+                    break;
+                case 'computer':
+                    resultText = `You lose! ${choicesDisplay[computerChoice]} beats ${choicesDisplay[playerChoice]}`;
+                    computerScore++;
+                    break;
+                case 'draw':
+                    resultText = `It's a draw! Both chose ${choicesDisplay[playerChoice]}`;
+                    break;
+            }
+            
+            resultDisplay.textContent = resultText;
+            playerScoreDisplay.textContent = playerScore;
+            computerScoreDisplay.textContent = computerScore;
+            
+            // Add to history
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.textContent = resultText;
+            historyList.prepend(historyItem);
+            
+            gameHistory.push({
+                playerChoice,
+                computerChoice,
+                result,
+                timestamp: new Date()
+            });
+        }
+        
+        // Play a round
+        function playRound(playerChoice) {
+            const computerChoice = getComputerChoice();
+            const result = determineWinner(playerChoice, computerChoice);
+            updateGame(result, playerChoice, computerChoice);
+        }
+        
+        // Reset the game
+        function resetGame() {
+            playerScore = 0;
+            computerScore = 0;
+            gameHistory = [];
+            resultDisplay.textContent = 'Choose your move!';
+            playerScoreDisplay.textContent = '0';
+            computerScoreDisplay.textContent = '0';
+            historyList.innerHTML = '<h3>Game History:</h3>';
+        }
+        
+        // Event listeners
+        choiceButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                const playerChoice = button.dataset.choice;
+                playRound(playerChoice);
+            });
+        });
+        
+        resetBtn.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>
